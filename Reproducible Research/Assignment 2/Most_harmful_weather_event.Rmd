@@ -1,0 +1,118 @@
+---
+title: "Reproducible Research Assignment 2"
+author: "Yanyu"
+date: "October 4, 2017"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+
+
+#Determine the  most harmful weather events with respect to population health and economic consequences
+
+knitr::opts_chunk$set(echo = TRUE)
+
+##Synopsis
+
+
+In this work we analyze the U.S. National Oceanic and Atmospheric Administration's (NOAA) storm database which tracks characteristics of major storms and weather events in the United States. The data includes when and where these events occur, as well as estimates of any fatalities, injuries, property and corn damage. The goal of the work is to find out the most harmful weather events with respect to population health and economic consequences. 
+
+1. Read data
+```{r}
+library(R.utils) #can't read origin file from bz2 to csv
+
+download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2", "StormData.csv.bz2")
+bunzip2("D:\\DATA\\coursera\\Data Scientist\\datasciencecoursera\\Reproducible Research\\Assignment 2\\StormData.csv.bz2")
+stormdata <- read.csv("D:\\DATA\\coursera\\Data Scientist\\datasciencecoursera\\Reproducible Research\\Assignment 2\\StormData.csv")
+```
+
+```{r}
+head(stormdata)
+```
+
+##Data Processing
+
+2. Select useful data
+```{r}
+stormdamages <- stormdata[c("STATE", "EVTYPE", "FATALITIES", "INJURIES", "PROPDMG", "PROPDMGEXP", "CROPDMG", "CROPDMGEXP")]
+head(stormdamages)
+```
+
+3. Clean data, convert data int intratable data
+```{r}
+unique(stormdamages$PROPDMGEXP)
+unique(stormdamages$CROPDMGEXP)
+```
+
+```{r}
+stormdamages[stormdamages$PROPDMGEXP == "K", ]$PROPDMG <- stormdamages[stormdamages$PROPDMGEXP == "K", ]$PROPDMG * 1000
+stormdamages[stormdamages$PROPDMGEXP == "M", ]$PROPDMG <- stormdamages[stormdamages$PROPDMGEXP == "M", ]$PROPDMG * 1000000
+stormdamages[stormdamages$PROPDMGEXP == "m", ]$PROPDMG <- stormdamages[stormdamages$PROPDMGEXP == "m", ]$PROPDMG * 1000000
+stormdamages[stormdamages$PROPDMGEXP == "B", ]$PROPDMG <- stormdamages[stormdamages$PROPDMGEXP == "B", ]$PROPDMG * 1000000000
+stormdamages[stormdamages$CROPDMGEXP == "K", ]$CROPDMG <- stormdamages[stormdamages$CROPDMGEXP == "K", ]$CROPDMG * 1000
+stormdamages[stormdamages$CROPDMGEXP == "k", ]$CROPDMG <- stormdamages[stormdamages$CROPDMGEXP == "k", ]$CROPDMG * 1000
+stormdamages[stormdamages$CROPDMGEXP == "M", ]$CROPDMG <- stormdamages[stormdamages$CROPDMGEXP == "M", ]$CROPDMG * 1000000
+stormdamages[stormdamages$CROPDMGEXP == "m", ]$CROPDMG <- stormdamages[stormdamages$CROPDMGEXP == "m", ]$CROPDMG * 1000000
+stormdamages[stormdamages$CROPDMGEXP == "B", ]$CROPDMG <- stormdamages[stormdamages$CROPDMGEXP == "B", ]$CROPDMG * 1000000000
+# change unit
+
+head(stormdamages)
+```
+
+
+##Result
+
+4. Further Processing data
+###Determine which kind of weather type causes the most harmful situation with respect to fatalities and injuries.
+```{r}
+#create subset of fatality and injuries related to event type
+library(dplyr)
+
+injuries <- stormdamages %>% filter(stormdamages$INJURIES >0) %>% group_by(EVTYPE) %>% summarise(totalInjuries = sum(INJURIES)) %>% arrange(desc(totalInjuries))
+fatalities <- stormdamages %>% filter(stormdamages$FATALITIES >0) %>% group_by(EVTYPE) %>% summarise(totalFatalities = sum(FATALITIES)) %>% arrange(desc(totalFatalities))
+head(fatalities)
+head(injuries) 
+```
+
+Plot
+```{r}
+par(mfrow = c(1,2), mar = c(10,5,3,2))
+
+topFatalities <- fatalities[1:10,]
+barplot(topFatalities$totalFatalities, las = 2, cex.axis = .7, names.arg = topFatalities$EVTYPE, main = "Top 10 Storms by Death Count", ylab = "number of fatalities", col = "sky blue")
+
+topInjuries <- injuries[1:10,]
+barplot(topInjuries$totalInjuries, las = 2, cex.axis = .7, names.arg = topInjuries$EVTYPE, main = "Top 10 Storms by Death Count", ylab = "number of fatalities", col = "sky blue")
+```
+
+
+###Determine which kind of weather type causes the most harmful situation with respect to economics consequences(Interm of Property damages and Crop damages).
+```{r}
+crops <- stormdamages %>% filter(stormdamages$CROPDMG >0) %>% group_by(EVTYPE) %>% summarise(totalcrops = sum(CROPDMG)) %>% arrange(desc(totalcrops))
+
+property <- stormdamages %>% filter(stormdamages$PROPDMG >0) %>% group_by(EVTYPE) %>% summarise(totalproperty = sum(PROPDMG)) %>% arrange(desc(totalproperty))
+head(crops)
+head(property) 
+```
+
+Merge the data
+```{r}
+total <- merge(property, crops, by = "EVTYPE")
+total$totaldamage = total$totalcrops + total$totalproperty
+total <- arrange(total, desc(totaldamage))
+```
+ 
+Plot
+```{r}
+
+top <- total[1:15,]
+barplot(top$totaldamage/1000000000, las = 2, cex.axis = .7, names.arg = top$EVTYPE, main = "Top 15 Storms by Economics consequences", ylab = "Damage Caused (billion dollars)", col = "sky blue")
+
+```
+
+##Summary:
+1. More Budget should be spent on tornado because tornado related injuries and death are the most. 
+2. Since flood caused the most property and crop damage, we should allocate enough protection techniques to the people that are relavant especially during high peak seasons of flood happending.
+
+
