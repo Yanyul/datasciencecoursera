@@ -1,0 +1,46 @@
+ ---
+title: "Regression Model Assignment"
+author: "Yanyu"
+date: "October 21, 2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Motor Trend Analysis
+
+##Summary
+The dataset is a extract from 1974 Motor Trend US magazine compromises the fuel consupmtion and 10 aspects of automobile design and performance. 
+
+```{r}
+library(gglot2)
+
+head(mtcars)
+```
+
+```{r}
+str(mtcars)
+```
+
+```{r}
+boxplot(mpg ~ am, data = mtcars,  
+        xlab="Transmission (0 = automatic, 1 = manual)",  
+        ylab="MPG - Miles/(US) gallon")
+```
+
+According on the boxplot chart, it's quite obvious that the mean and distribution of the Miles per Gallon (MPG) in manual transmission is higher than automatic transmission.
+
+
+##Simple Linear Regression Model
+MPG (mpg) vs Transmission (am) 
+
+
+
+
+
+
+
+
+

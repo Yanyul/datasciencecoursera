@@ -1,0 +1,67 @@
+---
+title: "Stat Simulation ass2"
+author: "Yanyu"
+date: "October 13, 2017"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Simulation Assignment
+
+##Requirement
+
+Now in the second portion of the project, we're going to analyze the ToothGrowth data in the R datasets package. 1. Load the ToothGrowth data and perform some basic exploratory data analyses 2. Provide a basic summary of the data. 3. Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. (Only use the techniques from class, even if there's other approaches worth considering) 4. State your conclusions and the assumptions needed for your conclusions. 
+
+##Summary
+
+This assignment is focussing on the relationship between supplements / doses and the growth of tooth in guinea pigs. At the end of the study the result is that there is no significant difference between different types of supplements but there is a relationship between the growth of the tooth and the doses of the supplements.
+
+##Research
+###Load the ToothGrowth data and perform some basic exploratory data analyses 
+
+The response is the length of odontoblasts (cells responsible for tooth growth) in 60 guinea pigs. Each animal received one of three dose levels of vitamin C (0.5, 1, and 2 mg/day) by one of two delivery methods, (orange juice or ascorbic acid (a form of vitamin C and coded as VC). Columns: Content: len numeric Tooth length supp factor Supplement type (VC or OJ). dose numeric Dose in milligrams/day Source: https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/ToothGrowth.html (https://stat.ethz.ch/Rmanual/R-devel/library/datasets/html/ToothGrowth.html)
+
+load the package
+```{r}
+library(datasets) 
+library(dplyr)
+library(ggplot2) 
+
+```
+
+read the data
+```{r}
+data("ToothGrowth") 
+head(ToothGrowth)
+```
+
+
+```{r}
+Growth <- ToothGrowth %>% group_by(supp, dose) %>% summarise(len = mean(len)) 
+Growth
+```
+
+
+```{r}
+t.test(len~supp, data=ToothGrowth)
+```
+
+```{r}
+doseHalf = ToothGrowth$len[ToothGrowth$dose == 0.5] 
+doseOne = ToothGrowth$len[ToothGrowth$dose == 1] 
+doseTwo = ToothGrowth$len[ToothGrowth$dose == 2] 
+ 
+t.test(doseHalf, doseOne, alternative = "less", paired = FALSE, var.equal = FALSE, conf.level = 0.95)
+```
+
+
+```{r}
+t.test(doseOne, doseTwo, alternative = "less", paired = FALSE, var.equal = FALSE, conf.level = 0.95)
+```
+
+My conclusion: There is no relationship between the type of supplement and the length of the tooth. This means that you could use either of them. Although the basic summary suggests that one supplement is better in small doses. This is not futher investigated. There is a relationship between the dose and the length of the tooth. The P values are to small so that the null hypotheses (diffence between doses is 0) have to be rejected.

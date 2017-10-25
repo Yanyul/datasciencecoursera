@@ -1,0 +1,108 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+ ---
+title: "Regression Model Assignment"
+author: "Yanyu"
+date: "October 21, 2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Motor Trend Analysis
+
+##Summary
+The dataset is a extract from 1974 Motor Trend US magazine compromises the fuel consupmtion and 10 aspects of automobile design and performance. 
+
+```{r}
+
+head(mtcars)
+```
+
+```{r}
+str(mtcars)
+```
+
+```{r}
+mtcars$am <- factor(mtcars$am) 
+boxplot(mpg ~ am, data = mtcars,  
+        xlab="Transmission (0 = automatic, 1 = manual)",  
+        ylab="MPG - Miles/(US) gallon")
+```
+
+According on the boxplot chart, it's quite obvious that the mean and distribution of the Miles per Gallon (MPG) in manual transmission is higher than automatic transmission.
+
+
+##Simple Linear Regression Model
+MPG (mpg) vs Transmission (am) 
+
+```{r}
+
+
+fit <- lm(mpg ~ am  , mtcars) 
+summary(fit)$coeff
+```
+
+```{r}
+summary(fit)$adj.r.squared
+```
+
+The p-value 0.000285 is lower than 5% confidence level. We can reject the null hypothesis that ??1 = 0. In other words, there is significant relationship between MPG and transmission type in the linear regression model with confidence level > 95%. However, the Adjusted R-squared value is quite low that only 33.85% of regression variance can be explained by this model. It may lead to higher chance of under fitting with this model. In other words, there might need tobe more variables that we take into consideration.  
+    
+
+##Multivariate Linear Regression Model 
+
+###Covariates Selection
+
+```{r}
+all_fit <- lm(mpg ~ ., data = mtcars) 
+all_fit$coefficients 
+
+summary(all_fit)$adj.r.squared
+```
+
+Weight (wt) and Gross Horsepower (hp) are selected because they are the other 2 variables with lowest p-values and standard errors. 
+
+```{r}
+wt_fit <- lm(mpg ~ wt, data = mtcars) 
+wt_fit$coefficients
+
+summary(wt_fit)$adj.r.squared
+```
+
+
+Obviously, weight (wt) variable has near to zero empirical p-values and very high Adjusted R-squared value at 74.46%. 
+
+```{r}
+hp_fit <- lm(mpg ~ hp, data = mtcars) 
+hp_fit$coefficients
+
+summary(hp_fit)$adj.r.squared
+```
+
+Obviously, horsepower (hp) variable has near to zero empirical p-values and high Adjusted R-squared value at 58.92%. So, weight (wt) and horsepower (hp) are best covariates to be associated into the regression model. 
+
+##MPG (mpg) vs Transmission (am) + Weight (wt) + Horsepower (hp) 
+
+```{r}
+best_fit <- lm(mpg ~ am + wt + hp, data = mtcars) 
+best_fit$coefficients 
+
+summary(best_fit)$adj.r.squared
+```
+
+In this Multivariate Regression Model, the p-value is near to zero, hence null hypothesis is rejected. This time, the R-squared value (82.27%) is much higher than the previous Simple Regression Model. 
+
+```{r}
+par(mfrow = c(2,2)) 
+plot(best_fit)
+```
+
+
+
+
