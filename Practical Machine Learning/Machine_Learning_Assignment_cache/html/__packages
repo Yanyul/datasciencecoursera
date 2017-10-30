@@ -1,0 +1,12 @@
+base
+lattice
+ggplot2
+caret
+GGally
+reshape
+e1071
+foreach
+iterators
+doParallel
+plyr
+moments
