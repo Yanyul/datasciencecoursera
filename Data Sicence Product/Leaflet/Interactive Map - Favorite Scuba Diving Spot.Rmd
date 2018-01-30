@@ -1,0 +1,23 @@
+---
+title: "Interactive Map"
+author: "Yanyu Lin"
+date: "January 28, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(leaflet)
+myDream <- leaflet() %>%
+  addTiles()
+
+myDream <- myDream %>%
+  addMarkers(lat=-16.426719, lng=145.994347,
+             popup="My Favourite Scuba Diving Spot (Norman Reef, Frankland Islands, Cairns, QLD)")
+myDream
+```
+
