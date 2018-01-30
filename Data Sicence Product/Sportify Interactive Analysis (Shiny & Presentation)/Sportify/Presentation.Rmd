@@ -1,0 +1,63 @@
+---
+title: "Sportify Song Prediction"
+author: "Yanyu Lin"
+date: "January 29, 2018"
+output: ioslides_presentation
+---
+
+
+## Goal of the project
+
+- A Shiny application that has widget input, ui input in server.R, reactive output using server calculations, and supporting documentation.
+
+- A Presentation that contains five slides in R Presentation.
+
+- All related souce codes are uploaded to Github.
+
+
+
+https://github.com/Yanyul/datasciencecoursera/tree/master/Data%20Sicence%20Product/Sportify%20Interactive%20Analysis%20(Shiny%20%26%20Presentation)/Sportify
+
+
+
+
+## Shiny Application
+
+- The application was designed to interactively predict whether certain attributes of a song will be liked or not.
+
+
+- Randomn Forest Classifier was applied to predict the result based on trained model.
+
+
+- Music composers might find it extremely useful for their future composition.
+
+
+- Attributes include : acousticness, danceability, duration_ms, energy, instrumentalness, key, liveness, loudness, mode, speechines, tempo, time_signature, valence, target
+
+
+
+## Sportify Data Set
+
+- Diamond data is from Kaggle Website, some useless predictors are removed in advance
+
+- Specify the predictor that were factor and change the datatype to integer (in ui.R input)
+
+
+```{r data, echo=FALSE, comment=NA}
+
+sportify <- read.csv("data.csv")
+sportify <- sportify[, c(-1,-16,-17)]
+sportify[sportify$target == 1, ]$target = "Like"
+sportify[sportify$target == 0, ]$target = "Dislike"
+sportify$target <- as.factor(sportify$target)
+
+```
+
+
+## Prediction Model
+
+### Model: randomForest(target~.,data=sportify,mtry=10,proximity=TRUE) 
+
+### Now you are able to identify what combination of attributes could yield a popular song!!!!
+
+
